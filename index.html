@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .expense-form {
+            width: 300px;
+            margin: 0 auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        .name-cell {
+            font-family: "Times New Roman", Times, serif;
+            font-weight: bold;
+            border-bottom: 2px solid #000;
+        }
+        .total-cell {
+            border-top: 2px solid #000;
+        }
+        .bold-separator {
+            border-bottom: 2px solid black;
+        }
+    </style>
+</head>
+<body>
+    <div class="expense-form">
+        <h1>Expense Tracker</h1>
+        <form id="expense-form">
+            <label for="name">Name: </label>
+            <input type="text" id="name" required>
+            <br>
+            <label for="item-cost">Item cost (£): </label>
+            <input type="number" id="item-cost" step="0.01" required>
+            <br>
+            <label for="item-description">Item description: </label>
+            <input type="text" id="item-description" required>
+            <br>
+            <label for="service-charge">Service charge (%): </label>
+            <input type="number" id="service-charge" step="0.01" value="10" required>
+            <br>
+            <button type="submit">Add Expense</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Item Cost (£)</th>
+                <th>Service Charge (£)</th>
+                <th>Total (£)</th>
+                <th>Item Description</th>
+            </tr>
+        </thead>
+        <tbody id="expense-list">
+        </tbody>
+    </table>
+    <p>Total Expense (Before Service Charge): <span id="total-expense">0.00</span></p>
+    <p>Total Service Charge: <span id="total-service-charge">0.00</span></p>
+    <p>Total Expense (Including Service Charge): <span id="total-expense-including-service">0.00</span></p>
+
+    <script>
+        const expenseForm = document.getElementById("expense-form");
+        const nameInput = document.getElementById("name");
+        const itemCostInput = document.getElementById("item-cost");
+        const itemDescriptionInput = document.getElementById("item-description");
+        const serviceChargeInput = document.getElementById("service-charge");
+        const expenseList = document.getElementById("expense-list");
+        const totalExpense = document.getElementById("total-expense");
+        const totalServiceCharge = document.getElementById("total-service-charge");
+        const totalExpenseIncludingService = document.getElementById("total-expense-including-service");
+        let expenses = {};
+        let previousName = "";  // Declare the previousName variable here
+
+        expenseForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const name = nameInput.value;
+            const itemCost = parseFloat(itemCostInput.value);
+            const itemDescription = itemDescriptionInput.value;
+            const serviceChargePercentage = parseFloat(serviceChargeInput.value) / 100;
+
+            if (!isNaN(itemCost) && itemDescription.trim() !== "") {
+                if (name !== previousName) {
+                    previousName = name;
+                }
+
+                if (!expenses[name]) {
+                    expenses[name] = [];
+                }
+
+                expenses[name].push({ cost: itemCost, description: itemDescription, serviceChargePercentage });
+                updateExpenseList();
+                itemCostInput.value = "";
+                itemDescriptionInput.value = "";
+            }
+        });
+
+        function updateExpenseList() {
+            expenseList.innerHTML = "";
+            let totalBeforeService = 0;
+            let totalService = 0;
+            let totalIncludingService = 0;
+
+            for (const name in expenses) {
+                if (expenses.hasOwnProperty(name)) {
+                    const personExpenses = expenses[name];
+                    const personTotalBeforeService = personExpenses.reduce((sum, expense) => sum + expense.cost, 0);
+                    const personTotalService = personExpenses.reduce((sum, expense) => sum + (expense.cost * expense.serviceChargePercentage), 0);
+                    const personTotalIncludingService = personTotalBeforeService + personTotalService;
+
+                    let isFirstRowForName = true;
+
+personExpenses.forEach((expense) => {
+    const row = document.createElement("tr");
+    
+    if (isFirstRowForName) {
+        const nameCell = document.createElement("td");
+        nameCell.textContent = name;
+        nameCell.rowSpan = personExpenses.length + 1;  // Adjust the rowspan for the additional total row
+        row.appendChild(nameCell);
+        isFirstRowForName = false;
+    }
+    
+    const costCell = document.createElement("td");
+    costCell.textContent = `£${expense.cost.toFixed(2)}`;
+    const serviceCell = document.createElement("td");
+    const serviceCharge = expense.cost * expense.serviceChargePercentage;
+    serviceCell.textContent = `£${serviceCharge.toFixed(2)} (${(expense.serviceChargePercentage * 100).toFixed(2)}%)`; // Display percentage with amount
+    const totalCell = document.createElement("td");
+    totalCell.textContent = `£${(expense.cost + serviceCharge).toFixed(2)}`;
+    const descriptionCell = document.createElement("td");
+    descriptionCell.textContent = expense.description;
+    row.appendChild(costCell);
+    row.appendChild(serviceCell);
+    row.appendChild(totalCell);
+    row.appendChild(descriptionCell);
+    expenseList.appendChild(row);
+});
+
+// Add an additional row for the person's total
+const totalRow = document.createElement("tr");
+const totalLabelCell = document.createElement("td");
+totalLabelCell.textContent = "Total for " + name;
+totalLabelCell.colSpan = 3; // Span across 3 columns
+const personTotalCell = document.createElement("td");
+personTotalCell.textContent = `£${personTotalIncludingService.toFixed(2)}`;
+personTotalCell.className = "total-cell";
+
+totalRow.appendChild(totalLabelCell);
+totalRow.appendChild(personTotalCell);
+
+// Apply the bold-separator class to the row
+totalRow.className = "bold-separator"; 
+
+expenseList.appendChild(totalRow);
+
+
+                    totalBeforeService += personTotalBeforeService;
+                    totalService += personTotalService;
+                    totalIncludingService += personTotalIncludingService;
+                }
+            }
+
+            totalExpense.textContent = `£${totalBeforeService.toFixed(2)}`;
+            totalServiceCharge.textContent = `£${totalService.toFixed(2)}`;
+            totalExpenseIncludingService.textContent = `£${totalIncludingService.toFixed(2)}`;
+
+        }
+
+    </script>
+</body>
+</html>
