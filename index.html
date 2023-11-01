@@ -5,36 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .expense-form {
-            width: 300px;
-            margin: 0 auto;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        .name-cell {
-            font-family: "Times New Roman", Times, serif;
-            font-weight: bold;
-            border-bottom: 2px solid #000;
-        }
-        .total-cell {
-            border-top: 2px solid #000;
-        }
-        .bold-separator {
-            border-bottom: 2px solid black;
-        }
+    /* Base styles */
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+    }
+    
+    /* Form styles */
+    .expense-form {
+        width: 300px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 5px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .expense-form h1 {
+        margin-top: 0;
+    }
+    
+    .expense-form label,
+    .expense-form input {
+        display: block;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .expense-form button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    
+    .expense-form button:hover {
+        background-color: #0056b3;
+    }
+    
+    /* Table styles */
+    table {
+        width: 90%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        background-color: #fff;
+    }
+    
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+    
+    th, td {
+        padding: 8px;
+        text-align: left;
+    }
+    
+    tbody tr:hover {
+        background-color: #f6f6f6;
+    }
+    
+    .name-cell {
+        font-family: "Times New Roman", Times, serif;
+        font-weight: bold;
+        border-bottom: 2px solid #000;
+    }
+    
+    .total-cell,
+    .bold-separator {
+        border-bottom: 2px solid #000;
+    }
+
     </style>
 </head>
 <body>
