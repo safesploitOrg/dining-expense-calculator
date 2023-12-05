@@ -1,10 +1,11 @@
 document.addEventListener("DOMContentLoaded", function() {
     const expenseForm = document.getElementById("expense-form");
-    let expenses = {};
+    let expenses = loadExpensesFromLocalStorage();
 
     function initialize() {
         attachEventListeners();
         loadExpensesFromLocalStorage();
+        updateExpenseList();
     }
 
     function attachEventListeners() {
@@ -133,10 +134,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadExpensesFromLocalStorage() {
         const storedExpenses = localStorage.getItem('expenses');
-        if (storedExpenses) {
-            expenses = JSON.parse(storedExpenses);
-            updateExpenseList();
-        }
+        return storedExpenses ? JSON.parse(storedExpenses) : {};
     }
 
     function handleBeforeUnload(e) {
