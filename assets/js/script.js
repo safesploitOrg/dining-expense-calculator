@@ -1,124 +1,148 @@
 document.addEventListener("DOMContentLoaded", function() {
-
     const expenseForm = document.getElementById("expense-form");
-    const nameInput = document.getElementById("name");
-    const itemCostInput = document.getElementById("item-cost");
-    const itemDescriptionInput = document.getElementById("item-description");
-    const serviceChargeInput = document.getElementById("service-charge");
-    const expenseList = document.getElementById("expense-list");
-    const totalExpense = document.getElementById("total-expense");
-    const totalServiceCharge = document.getElementById("total-service-charge");
-    const totalExpenseIncludingService = document.getElementById("total-expense-including-service");
-
     let expenses = {};
-    let previousName = "";
 
-    expenseForm.addEventListener("submit", function(e) {
+    function initialize() {
+        attachEventListeners();
+        loadExpensesFromLocalStorage();
+    }
+
+    function attachEventListeners() {
+        expenseForm.addEventListener("submit", handleFormSubmit);
+        window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    function handleFormSubmit(e) {
         e.preventDefault();
-
-        const name = nameInput.value;
-        const itemCost = parseFloat(itemCostInput.value);
-        const itemDescription = itemDescriptionInput.value;
-        const serviceChargePercentage = parseFloat(serviceChargeInput.value) / 100;
-
-        if (!isNaN(itemCost) && itemDescription.trim() !== "") {
-            if (name !== previousName) {
-                previousName = name;
-            }
-
-            if (!expenses[name]) {
-                expenses[name] = [];
-            }
-
-            expenses[name].push({
-                cost: itemCost,
-                description: itemDescription,
-                serviceChargePercentage
-            });
-
+        const formData = getFormData();
+        if (isValidExpense(formData)) {
+            addExpense(formData);
             updateExpenseList();
-            itemCostInput.value = "";
-            itemDescriptionInput.value = "";
+            saveExpensesToLocalStorage();
+            resetFormInputs();
         }
-    });
+    }
+
+    function getFormData() {
+        return {
+            name: document.getElementById("name").value,
+            itemCost: parseFloat(document.getElementById("item-cost").value),
+            itemDescription: document.getElementById("item-description").value,
+            serviceChargePercentage: parseFloat(document.getElementById("service-charge").value) / 100
+        };
+    }
+
+    function isValidExpense(expenseData) {
+        return !isNaN(expenseData.itemCost) && expenseData.itemDescription.trim() !== "";
+    }
+
+    function addExpense(expenseData) {
+        if (!expenses[expenseData.name]) {
+            expenses[expenseData.name] = [];
+        }
+        expenses[expenseData.name].push(expenseData);
+    }
+
+    function resetFormInputs() {
+        document.getElementById("item-cost").value = "";
+        document.getElementById("item-description").value = "";
+    }
 
     function updateExpenseList() {
+        const expenseList = document.getElementById("expense-list");
         expenseList.innerHTML = "";
-        let totalBeforeService = 0;
-        let totalService = 0;
-        let totalIncludingService = 0;
+        let totalBeforeService = 0, totalService = 0, totalIncludingService = 0;
 
-        for (const name in expenses) {
-            if (expenses.hasOwnProperty(name)) {
-                const personExpenses = expenses[name];
-                const personTotalBeforeService = personExpenses.reduce((sum, expense) => sum + expense.cost, 0);
-                // (Continuation from where we left off)
-                const personTotalService = personExpenses.reduce((sum, expense) => sum + (expense.cost * expense.serviceChargePercentage), 0);
-                const personTotalIncludingService = personTotalBeforeService + personTotalService;
-
-                totalBeforeService += personTotalBeforeService;
-                totalService += personTotalService;
-                totalIncludingService += personTotalIncludingService;
-
-                personExpenses.forEach(expense => {
-                    const row = document.createElement("tr");
-                    const nameCell = document.createElement("td");
-                    const costCell = document.createElement("td");
-                    const serviceChargeCell = document.createElement("td");
-                    const totalCell = document.createElement("td");
-                    const descriptionCell = document.createElement("td");
-
-                    nameCell.textContent = name;
-                    costCell.textContent = expense.cost.toFixed(2);
-                    serviceChargeCell.textContent = (expense.cost * expense.serviceChargePercentage).toFixed(2);
-                    totalCell.textContent = (expense.cost + (expense.cost * expense.serviceChargePercentage)).toFixed(2);
-                    descriptionCell.textContent = expense.description;
-
-                    row.appendChild(nameCell);
-                    row.appendChild(costCell);
-                    row.appendChild(serviceChargeCell);
-                    row.appendChild(totalCell);
-                    row.appendChild(descriptionCell);
-
-                    expenseList.appendChild(row);
-                });
-
-                // Append the total row for each person
-                const totalRow = document.createElement("tr");
-                const totalNameCell = document.createElement("td");
-                const totalCostCell = document.createElement("td");
-                const totalServiceChargeCell = document.createElement("td");
-                const personTotalCell = document.createElement("td");
-
-                totalNameCell.textContent = name + " Total:";
-                totalNameCell.classList.add("bold-separator");
-                totalCostCell.textContent = personTotalBeforeService.toFixed(2);
-                totalCostCell.classList.add("bold-separator");
-                totalServiceChargeCell.textContent = personTotalService.toFixed(2);
-                totalServiceChargeCell.classList.add("bold-separator");
-                personTotalCell.textContent = personTotalIncludingService.toFixed(2);
-                personTotalCell.classList.add("bold-separator");
-
-                totalRow.appendChild(totalNameCell);
-                totalRow.appendChild(totalCostCell);
-                totalRow.appendChild(totalServiceChargeCell);
-                totalRow.appendChild(personTotalCell);
-
-                expenseList.appendChild(totalRow);
-            }
-        }
-
-        totalExpense.textContent = totalBeforeService.toFixed(2);
-        totalServiceCharge.textContent = totalService.toFixed(2);
-        totalExpenseIncludingService.textContent = totalIncludingService.toFixed(2);
-
-        // prompt users before they refresh the page
-        window.addEventListener('beforeunload', function (e) {
-            // Cancel the event as stated by the standard.
-            e.preventDefault();
-            // Chrome requires returnValue to be set.
-            e.returnValue = '';
+        Object.keys(expenses).forEach(name => {
+            const personExpenses = expenses[name];
+            const totals = calculatePersonTotals(personExpenses);
+            totalBeforeService += totals.beforeService;
+            totalService += totals.service;
+            totalIncludingService += totals.includingService;
+            appendExpensesToTable(name, personExpenses, totals);
         });
-        
+
+        updateTotalDisplays(totalBeforeService, totalService, totalIncludingService);
     }
+
+    function calculatePersonTotals(personExpenses) {
+        const totalBeforeService = personExpenses.reduce((sum, expense) => sum + expense.itemCost, 0);
+        const totalService = personExpenses.reduce((sum, expense) => sum + (expense.itemCost * expense.serviceChargePercentage), 0);
+        return {
+            beforeService: totalBeforeService,
+            service: totalService,
+            includingService: totalBeforeService + totalService
+        };
+    }
+
+    function appendExpensesToTable(name, personExpenses, totals) {
+        const expenseList = document.getElementById("expense-list");
+    
+        personExpenses.forEach((expense) => {
+            const row = document.createElement("tr");
+    
+            const nameCell = document.createElement("td");
+            nameCell.textContent = name;
+    
+            const costCell = document.createElement("td");
+            costCell.textContent = `£${expense.itemCost.toFixed(2)}`;
+    
+            const serviceChargeCell = document.createElement("td");
+            const serviceCharge = expense.itemCost * expense.serviceChargePercentage;
+            serviceChargeCell.textContent = `£${serviceCharge.toFixed(2)}`;
+    
+            const totalCell = document.createElement("td");
+            totalCell.textContent = `£${(expense.itemCost + serviceCharge).toFixed(2)}`;
+    
+            const descriptionCell = document.createElement("td");
+            descriptionCell.textContent = expense.itemDescription;
+    
+            row.appendChild(nameCell);
+            row.appendChild(costCell);
+            row.appendChild(serviceChargeCell);
+            row.appendChild(totalCell);
+            row.appendChild(descriptionCell);
+    
+            expenseList.appendChild(row);
+        });
+    
+        // Append the total row for this person
+        const totalRow = document.createElement("tr");
+        const totalNameCell = document.createElement("td");
+        totalNameCell.textContent = name + " Total:";
+        totalNameCell.colSpan = 4;
+    
+        const personTotalCell = document.createElement("td");
+        personTotalCell.textContent = `£${(totals.includingService || 0).toFixed(2)}`; //safety check
+    
+        totalRow.appendChild(totalNameCell);
+        totalRow.appendChild(personTotalCell);
+    
+        expenseList.appendChild(totalRow);
+    }    
+
+    function updateTotalDisplays(totalBeforeService, totalService, totalIncludingService) {
+        document.getElementById("total-expense").textContent = totalBeforeService.toFixed(2);
+        document.getElementById("total-service-charge").textContent = totalService.toFixed(2);
+        document.getElementById("total-expense-including-service").textContent = totalIncludingService.toFixed(2);
+    }
+
+    function saveExpensesToLocalStorage() {
+        localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+
+    function loadExpensesFromLocalStorage() {
+        const storedExpenses = localStorage.getItem('expenses');
+        if (storedExpenses) {
+            expenses = JSON.parse(storedExpenses);
+            updateExpenseList();
+        }
+    }
+
+    function handleBeforeUnload(e) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+
+    initialize();
 });
