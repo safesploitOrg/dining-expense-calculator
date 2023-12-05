@@ -111,5 +111,14 @@ document.addEventListener("DOMContentLoaded", function() {
         totalExpense.textContent = totalBeforeService.toFixed(2);
         totalServiceCharge.textContent = totalService.toFixed(2);
         totalExpenseIncludingService.textContent = totalIncludingService.toFixed(2);
+
+        // prompt users before they refresh the page
+        window.addEventListener('beforeunload', function (e) {
+            // Cancel the event as stated by the standard.
+            e.preventDefault();
+            // Chrome requires returnValue to be set.
+            e.returnValue = '';
+        });
+        
     }
 });
