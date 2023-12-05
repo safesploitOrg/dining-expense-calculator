@@ -87,3 +87,29 @@ tbody tr:hover {
         font-size: 0.9em;
     }
 }
+
+/* Clear Expenses Button Styles */
+#clear-expenses {
+    background-color: #d9534f; /* Bootstrap 'btn-danger' color */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px; /* Space from other elements */
+}
+
+#clear-expenses:hover {
+    background-color: #c9302c; /* Darker shade on hover */
+}
+
+#clear-expenses:focus {
+    outline: none; /* Removes outline on focus for cleaner look */
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end; /* Aligns the button to the right */
+}

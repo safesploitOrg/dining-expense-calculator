@@ -1,10 +1,14 @@
 document.addEventListener("DOMContentLoaded", function() {
     const expenseForm = document.getElementById("expense-form");
-    let expenses = {};
+    let expenses = loadExpensesFromLocalStorage();
 
     function initialize() {
         attachEventListeners();
         loadExpensesFromLocalStorage();
+        updateExpenseList();
+
+        const clearButton = document.getElementById("clear-expenses");
+        clearButton.addEventListener("click", clearExpenses);
     }
 
     function attachEventListeners() {
@@ -22,6 +26,17 @@ document.addEventListener("DOMContentLoaded", function() {
             resetFormInputs();
         }
     }
+
+    function clearExpenses() {
+        if (confirm("Are you sure you want to clear all expenses? This action cannot be undone.")) {
+            // Clear local storage and reset the expenses object
+            localStorage.removeItem('expenses');
+            expenses = {};
+            // Update the UI to reflect the cleared expenses
+            updateExpenseList();
+        }
+    }
+    
 
     function getFormData() {
         return {
@@ -133,10 +148,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function loadExpensesFromLocalStorage() {
         const storedExpenses = localStorage.getItem('expenses');
-        if (storedExpenses) {
-            expenses = JSON.parse(storedExpenses);
-            updateExpenseList();
-        }
+        return storedExpenses ? JSON.parse(storedExpenses) : {};
     }
 
     function handleBeforeUnload(e) {
