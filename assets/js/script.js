@@ -16,6 +16,12 @@ document.addEventListener("DOMContentLoaded", function() {
         window.addEventListener('beforeunload', handleBeforeUnload);
     }
 
+    // Add the following function to enforce numeric input with a decimal point
+    document.getElementById('item-cost').addEventListener('input', function(event) {
+        // Remove non-numeric characters except decimal point
+        this.value = this.value.replace(/[^0-9.]/g, '');
+    });
+    
     function handleFormSubmit(e) {
         e.preventDefault();
         const formData = getFormData();
