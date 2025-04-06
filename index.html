@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expense Tracker</title>
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/images/dining-icon-96.png">
     <link rel="stylesheet" href="assets/css/styles.css">
     <link rel="stylesheet" href="assets/bootstrap-4.6.2-dist/css/bootstrap.min.css">
 </head>
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-    <div class="container mt-5">
+    <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
@@ -43,15 +44,16 @@
                     <th>Service Charge (£)</th>
                     <th>Total (£)</th>
                     <th>Item Description</th>
-                    <th>Delete</th>
+                    <th></th>
                 </tr>
             </thead>            
             <tbody id="expense-list">
             </tbody>
         </table>
+        <hr></ht>
         <p>Total Expense (Before Service Charge): <span id="total-expense">0.00</span></p>
         <p>Total Service Charge: <span id="total-service-charge">0.00</span></p>
-        <p>Total Expense (Including Service Charge): <span id="total-expense-including-service">0.00</span></p>
+        <p><b>Total Expense (Including Service Charge): </b><span id="total-expense-including-service">0.00</span></p>
     </div>
 
     <div class="container mt-5">
@@ -66,4 +68,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha384-vtXRMe3mGCbOeY7l30aIg8H9p3GdeSe4IFlP6G8JMa7o7lXvnz3GFKzPxzJdPfGK" crossorigin="anonymous"></script>
 
 </body>
+<footer class="text-center mt-5 mb-3">
+    <p>
+        © <span id="year"></span>
+        <strong>Dining Expense Tracker</strong> —
+        <a href="https://github.com/safesploitOrg/dining-expense-calculator" target="_blank" rel="noopener noreferrer">
+            GitHub
+        </a>
+    </p>
+</footer>
 </html>

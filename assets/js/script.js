@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
         attachEventListeners();
         loadExpensesFromLocalStorage();
         updateExpenseList();
+        setFooterYear();
 
         const clearButton = document.getElementById("clear-expenses");
         clearButton.addEventListener("click", clearExpenses);
@@ -120,7 +121,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
             const deleteCell = document.createElement("td");
             const deleteButton = document.createElement("button");
-            deleteButton.textContent = "Delete";
+            deleteButton.textContent = "X";
             deleteButton.className = "btn btn-sm btn-danger";
             deleteButton.addEventListener("click", () => {
                 const confirmed = confirm(`Are you sure you want to delete this item for ${name}?`);
@@ -165,13 +166,21 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     }
     
-    
 
+    const GBP = new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    
+    // Update the total displays (in GBP)
     function updateTotalDisplays(totalBeforeService, totalService, totalIncludingService) {
-        document.getElementById("total-expense").textContent = totalBeforeService.toFixed(2);
-        document.getElementById("total-service-charge").textContent = totalService.toFixed(2);
-        document.getElementById("total-expense-including-service").textContent = totalIncludingService.toFixed(2);
+        document.getElementById("total-expense").textContent = GBP.format(totalBeforeService);
+        document.getElementById("total-service-charge").textContent = GBP.format(totalService);
+        document.getElementById("total-expense-including-service").textContent = GBP.format(totalIncludingService);
     }
+    
 
     function saveExpensesToLocalStorage() {
         localStorage.setItem('expenses', JSON.stringify(expenses));
@@ -186,6 +195,12 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         e.returnValue = '';
     }
+
+    function setFooterYear() {
+        const year = new Date().getFullYear();
+        document.getElementById('year').textContent = year;
+    }
+    
 
     initialize();
 });
