@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
         attachEventListeners();
         loadExpensesFromLocalStorage();
         updateExpenseList();
+        setFooterYear();
 
         const clearButton = document.getElementById("clear-expenses");
         clearButton.addEventListener("click", clearExpenses);
@@ -99,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function() {
     function appendExpensesToTable(name, personExpenses, totals) {
         const expenseList = document.getElementById("expense-list");
     
-        personExpenses.forEach((expense) => {
+        personExpenses.forEach((expense, index) => {
             const row = document.createElement("tr");
     
             const nameCell = document.createElement("td");
@@ -108,8 +109,8 @@ document.addEventListener("DOMContentLoaded", function() {
             const costCell = document.createElement("td");
             costCell.textContent = `£${expense.itemCost.toFixed(2)}`;
     
-            const serviceChargeCell = document.createElement("td");
             const serviceCharge = expense.itemCost * expense.serviceChargePercentage;
+            const serviceChargeCell = document.createElement("td");
             serviceChargeCell.textContent = `£${serviceCharge.toFixed(2)}`;
     
             const totalCell = document.createElement("td");
@@ -118,35 +119,68 @@ document.addEventListener("DOMContentLoaded", function() {
             const descriptionCell = document.createElement("td");
             descriptionCell.textContent = expense.itemDescription;
     
+            const deleteCell = document.createElement("td");
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "X";
+            deleteButton.className = "btn btn-sm btn-danger";
+            deleteButton.addEventListener("click", () => {
+                const confirmed = confirm(`Are you sure you want to delete this item for ${name}?`);
+                if (confirmed) {
+                    deleteExpense(name, index);
+                }
+            });            
+            deleteCell.appendChild(deleteButton);
+    
             row.appendChild(nameCell);
             row.appendChild(costCell);
             row.appendChild(serviceChargeCell);
             row.appendChild(totalCell);
             row.appendChild(descriptionCell);
+            row.appendChild(deleteCell);
     
             expenseList.appendChild(row);
         });
     
-        // Append the total row for this person
         const totalRow = document.createElement("tr");
         const totalNameCell = document.createElement("td");
         totalNameCell.textContent = name + " Total:";
         totalNameCell.colSpan = 4;
     
         const personTotalCell = document.createElement("td");
-        personTotalCell.textContent = `£${(totals.includingService || 0).toFixed(2)}`; //safety check
+        personTotalCell.textContent = `£${(totals.includingService || 0).toFixed(2)}`;
     
         totalRow.appendChild(totalNameCell);
         totalRow.appendChild(personTotalCell);
     
         expenseList.appendChild(totalRow);
-    }    
-
-    function updateTotalDisplays(totalBeforeService, totalService, totalIncludingService) {
-        document.getElementById("total-expense").textContent = totalBeforeService.toFixed(2);
-        document.getElementById("total-service-charge").textContent = totalService.toFixed(2);
-        document.getElementById("total-expense-including-service").textContent = totalIncludingService.toFixed(2);
     }
+
+    function deleteExpense(name, index) {
+        if (expenses[name]) {
+            expenses[name].splice(index, 1);
+            if (expenses[name].length === 0) {
+                delete expenses[name];
+            }
+            saveExpensesToLocalStorage();
+            updateExpenseList();
+        }
+    }
+    
+
+    const GBP = new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+    
+    // Update the total displays (in GBP)
+    function updateTotalDisplays(totalBeforeService, totalService, totalIncludingService) {
+        document.getElementById("total-expense").textContent = GBP.format(totalBeforeService);
+        document.getElementById("total-service-charge").textContent = GBP.format(totalService);
+        document.getElementById("total-expense-including-service").textContent = GBP.format(totalIncludingService);
+    }
+    
 
     function saveExpensesToLocalStorage() {
         localStorage.setItem('expenses', JSON.stringify(expenses));
@@ -161,6 +195,12 @@ document.addEventListener("DOMContentLoaded", function() {
         e.preventDefault();
         e.returnValue = '';
     }
+
+    function setFooterYear() {
+        const year = new Date().getFullYear();
+        document.getElementById('year').textContent = year;
+    }
+    
 
     initialize();
 });

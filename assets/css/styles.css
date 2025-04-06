@@ -81,12 +81,58 @@ tbody tr:hover {
     border-bottom: 2px solid #000;
 }
 
+/* Footer */
+footer {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+footer a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+
 /* Responsive design adjustments */
 @media (max-width: 400px) {
     body {
         font-size: 0.9em;
     }
 }
+
+/* Responsive design for iPhone 16 */
+@media (max-width: 576px) {
+    body {
+        font-size: 0.9rem;
+    }
+
+    .expense-form {
+        padding: 15px;
+    }
+
+    .expense-form button,
+    #clear-expenses {
+        font-size: 0.9rem;
+        padding: 8px 12px;
+    }
+
+    table th,
+    table td {
+        font-size: 0.85rem;
+        padding: 6px;
+    }
+
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+}
+
 
 /* Clear Expenses Button Styles */
 #clear-expenses {
