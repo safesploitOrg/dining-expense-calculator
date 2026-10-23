@@ -1,0 +1,160 @@
+
+> dining-expense-calculator@2.0.0 check
+> npm run lint && npm run test:unit && npm run security:check
+
+
+> dining-expense-calculator@2.0.0 lint
+> node scripts/check-source.mjs
+
+SOURCE CHECK PASS — 9 JavaScript files parsed, HTML IDs unique, basic assets present.
+
+> dining-expense-calculator@2.0.0 test:unit
+> node --test tests/unit/*.test.js
+
+TAP version 13
+# Subtest: global service rate recalculates every existing item without mutation
+ok 1 - global service rate recalculates every existing item without mutation
+  ---
+  duration_ms: 3.584267
+  type: 'test'
+  ...
+# Subtest: shared single penny is allocated deterministically and never lost
+ok 2 - shared single penny is allocated deterministically and never lost
+  ---
+  duration_ms: 0.319294
+  type: 'test'
+  ...
+# Subtest: proportional service pennies allocated to participants with exact reconciliation
+ok 3 - proportional service pennies allocated to participants with exact reconciliation
+  ---
+  duration_ms: 0.386263
+  type: 'test'
+  ...
+# Subtest: updates/deletes an item by stable ID
+ok 4 - updates/deletes an item by stable ID
+  ---
+  duration_ms: 0.34386
+  type: 'test'
+  ...
+# Subtest: rejects duplicate names, missing participants, unsafe quantities, and removal while in use
+ok 5 - rejects duplicate names, missing participants, unsafe quantities, and removal while in use
+  ---
+  duration_ms: 0.470669
+  type: 'test'
+  ...
+# Subtest: no participants/items is a valid £0 bill
+ok 6 - no participants/items is a valid £0 bill
+  ---
+  duration_ms: 0.218664
+  type: 'test'
+  ...
+# Subtest: imports original dictionary of items with a consistent service percentage
+ok 7 - imports original dictionary of items with a consistent service percentage
+  ---
+  duration_ms: 6.981077
+  type: 'test'
+  ...
+# Subtest: mixed historic rates are flagged and require deliberate selection
+ok 8 - mixed historic rates are flagged and require deliberate selection
+  ---
+  duration_ms: 2.865341
+  type: 'test'
+  ...
+# Subtest: invalid legacy input is not destroyed or silently overwritten
+ok 9 - invalid legacy input is not destroyed or silently overwritten
+  ---
+  duration_ms: 0.26304
+  type: 'test'
+  ...
+# Subtest: invalid new-format input preserves original v2 data
+ok 10 - invalid new-format input preserves original v2 data
+  ---
+  duration_ms: 0.190232
+  type: 'test'
+  ...
+# Subtest: template persistence does not include line items and handles corrupted storage
+ok 11 - template persistence does not include line items and handles corrupted storage
+  ---
+  duration_ms: 0.867396
+  type: 'test'
+  ...
+# Subtest: accepts ordinary prices as exact integer pennies
+ok 12 - accepts ordinary prices as exact integer pennies
+  ---
+  duration_ms: 3.77458
+  type: 'test'
+  ...
+# Subtest: rejects invalid/ambiguous monetary values
+ok 13 - rejects invalid/ambiguous monetary values
+  ---
+  duration_ms: 3.115296
+  type: 'test'
+  ...
+# Subtest: supports 12.5% as basis points, rejecting oversized rates
+ok 14 - supports 12.5% as basis points, rejecting oversized rates
+  ---
+  duration_ms: 0.549015
+  type: 'test'
+  ...
+# Subtest: rounds service charge once, half up, in exact pennies
+ok 15 - rounds service charge once, half up, in exact pennies
+  ---
+  duration_ms: 0.221028
+  type: 'test'
+  ...
+# Subtest: largest-remainder sharing handles pennies and exact sums
+ok 16 - largest-remainder sharing handles pennies and exact sums
+  ---
+  duration_ms: 0.999093
+  type: 'test'
+  ...
+# Subtest: deterministic property check: all splits sum to total
+ok 17 - deterministic property check: all splits sum to total
+  ---
+  duration_ms: 10.652174
+  type: 'test'
+  ...
+# Subtest: recognises purchased items, total and service without double-counting
+ok 18 - recognises purchased items, total and service without double-counting
+  ---
+  duration_ms: 3.387826
+  type: 'test'
+  ...
+# Subtest: derives optional service rate from subtotal and printed service amount
+ok 19 - derives optional service rate from subtotal and printed service amount
+  ---
+  duration_ms: 0.334817
+  type: 'test'
+  ...
+# Subtest: does not mistake date/VAT/cash/total for purchased items
+ok 20 - does not mistake date/VAT/cash/total for purchased items
+  ---
+  duration_ms: 0.232906
+  type: 'test'
+  ...
+# Subtest: reports empty and inconsistent OCR data without inventing items
+ok 21 - reports empty and inconsistent OCR data without inventing items
+  ---
+  duration_ms: 0.205976
+  type: 'test'
+  ...
+# Subtest: bounds untrusted receipt text length and pins the external OCR script
+ok 22 - bounds untrusted receipt text length and pins the external OCR script
+  ---
+  duration_ms: 0.263742
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 142.397016
+
+> dining-expense-calculator@2.0.0 security:check
+> node scripts/security-check.mjs
+
+SECURITY CHECK PASS — 10 source files checked for dangerous DOM patterns, 27 text files screened for common literal secrets; CSP and CI gates inspected. Targeted checks only, not a full SAST/secret audit.

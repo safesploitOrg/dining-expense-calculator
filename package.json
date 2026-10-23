@@ -1,0 +1,15 @@
+{
+  "name": "dining-expense-calculator",
+  "version": "2.0.2",
+  "private": true,
+  "type": "module",
+  "description": "Local-first restaurant bill calculator with sharing and optional receipt OCR",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "test": "npm run test:unit",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "lint": "node scripts/check-source.mjs",
+    "security:check": "node scripts/security-check.mjs",
+    "check": "npm run lint && npm run test:unit && npm run security:check"
+  }
+}
