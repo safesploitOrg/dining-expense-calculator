@@ -3,7 +3,9 @@ name: Validate and deploy Dining Split
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: 
+      - main
+      - staging
   workflow_dispatch:
 
 permissions:
@@ -66,6 +68,7 @@ jobs:
         with:
           category: '/language:javascript-typescript'
 
+  # On main branch, deploy to GitHub Pages only after all validation jobs pass.
   deploy:
     # OCR parses untrusted files: public deployment requires deliberate human dispatch.
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
