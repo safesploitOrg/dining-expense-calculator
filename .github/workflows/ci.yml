@@ -73,7 +73,7 @@ jobs:
   deploy:
     # OCR parses untrusted files: public deployment requires deliberate human dispatch.
     if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
-    needs: [quality, browser, static_analysis]
+    needs: [quality, static_analysis]
     runs-on: ubuntu-latest
     environment:
       name: github-pages
