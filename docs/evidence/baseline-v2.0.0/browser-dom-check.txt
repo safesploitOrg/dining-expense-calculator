@@ -1,0 +1,12 @@
+test_camera_image_through_mocked_local_ocr_worker (test_workflows.BrowserWorkflows.test_camera_image_through_mocked_local_ocr_worker) ... ok
+test_global_service_charge_and_browser_refresh (test_workflows.BrowserWorkflows.test_global_service_charge_and_browser_refresh) ... ok
+test_mixed_legacy_rates_require_review_and_preserve_original (test_workflows.BrowserWorkflows.test_mixed_legacy_rates_require_review_and_preserve_original) ... ok
+test_mobile_layout_and_untrusted_text (test_workflows.BrowserWorkflows.test_mobile_layout_and_untrusted_text) ... ok
+test_receipt_text_review_and_reconcile (test_workflows.BrowserWorkflows.test_receipt_text_review_and_reconcile) ... ok
+test_shared_item_edit_and_undo_delete (test_workflows.BrowserWorkflows.test_shared_item_edit_and_undo_delete) ... ok
+test_template_creates_new_session_without_items (test_workflows.BrowserWorkflows.test_template_creates_new_session_without_items) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 14.519s
+
+OK

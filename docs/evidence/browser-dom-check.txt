@@ -1,0 +1,20 @@
+test_adding_diners_after_scanning_updates_receipt_owner_choices (test_workflows.BrowserWorkflows.test_adding_diners_after_scanning_updates_receipt_owner_choices) ... ok
+test_camera_image_through_mocked_local_ocr_worker (test_workflows.BrowserWorkflows.test_camera_image_through_mocked_local_ocr_worker) ... ok
+test_camera_menu_requests_spatial_tsv_and_separates_columns (test_workflows.BrowserWorkflows.test_camera_menu_requests_spatial_tsv_and_separates_columns) ... ok
+test_global_service_charge_and_browser_refresh (test_workflows.BrowserWorkflows.test_global_service_charge_and_browser_refresh) ... ok
+test_menu_mode_prevents_receipt_metadata_and_keeps_manual_input (test_workflows.BrowserWorkflows.test_menu_mode_prevents_receipt_metadata_and_keeps_manual_input) ... ok
+test_mixed_legacy_rates_require_review_and_preserve_original (test_workflows.BrowserWorkflows.test_mixed_legacy_rates_require_review_and_preserve_original) ... ok
+test_mobile_layout_and_untrusted_text (test_workflows.BrowserWorkflows.test_mobile_layout_and_untrusted_text) ... ok
+test_noisy_two_column_menu_recovery_currency_guard_and_explicit_add (test_workflows.BrowserWorkflows.test_noisy_two_column_menu_recovery_currency_guard_and_explicit_add) ... ok
+test_receipt_text_review_and_reconcile (test_workflows.BrowserWorkflows.test_receipt_text_review_and_reconcile) ... ok
+test_receipt_total_currency_never_relabels_dollars_as_pounds (test_workflows.BrowserWorkflows.test_receipt_total_currency_never_relabels_dollars_as_pounds) ... ok
+test_scan_row_edit_skip_restore_and_invalid_price_never_commits (test_workflows.BrowserWorkflows.test_scan_row_edit_skip_restore_and_invalid_price_never_commits) ... ok
+test_scanned_dropdown_prefills_without_adding_and_manual_entry_is_independent (test_workflows.BrowserWorkflows.test_scanned_dropdown_prefills_without_adding_and_manual_entry_is_independent) ... ok
+test_service_rate_updates_immediately_on_mobile_and_preserves_valid_rate (test_workflows.BrowserWorkflows.test_service_rate_updates_immediately_on_mobile_and_preserves_valid_rate) ... ok
+test_shared_item_edit_and_undo_delete (test_workflows.BrowserWorkflows.test_shared_item_edit_and_undo_delete) ... ok
+test_template_creates_new_session_without_items (test_workflows.BrowserWorkflows.test_template_creates_new_session_without_items) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 52.568s
+
+OK

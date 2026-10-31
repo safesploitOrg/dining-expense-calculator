@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#143b39">
+  <meta name="description" content="Split restaurant bills accurately, with shared items, one service charge, and optional receipt scanning. Private and browser-only.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'; img-src 'self' blob: data:; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; style-src 'self'; font-src 'self'; connect-src 'self' https://cdn.jsdelivr.net https://tessdata.projectnaptha.com; worker-src 'self' blob: https://cdn.jsdelivr.net; child-src blob:; manifest-src 'self'">
+  <title>Dining Split — Restaurant Bill Calculator</title>
+  <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./assets/icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./assets/css/styles.css">
+  <script type="module" src="./assets/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to calculator</a>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <div class="brand"><div class="brand-symbol" aria-hidden="true">✳</div><div><strong>Dining Split</strong><small>Simple bills, settled.</small></div></div>
+      <div class="header-actions">
+        <button type="button" id="share-btn" class="button button-quiet">Share summary</button>
+        <button type="button" id="new-bill-btn" class="button button-outline">New bill</button>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="shell main-layout">
+    <div id="app-alert" class="notice notice-error hidden" role="alert"></div>
+    <section id="migration-notice" class="notice notice-warning hidden" aria-labelledby="migration-title">
+      <h2 id="migration-title">Check your imported service charge</h2>
+      <p>Your previously saved items had different service rates. We have kept all their original data. Choose one percentage for the full bill before using the new totals.</p>
+      <div id="legacy-rate-choices" class="inline-buttons"></div>
+      <button type="button" id="confirm-legacy-btn" class="button button-primary">Apply current percentage to all items</button>
+    </section>
+
+    <div class="page-heading">
+      <div><p class="eyebrow">THE BILL</p><h1>Everyone pays their part.</h1><p class="subheading">Add each order, split shared plates and get the maths right before the bill arrives.</p></div>
+    </div>
+
+    <div class="workspace">
+      <div class="entry-column">
+        <section class="panel" aria-labelledby="settings-title">
+          <div class="section-heading"><span class="step">01</span><h2 id="settings-title">Bill settings</h2></div>
+          <div class="form-grid">
+            <label class="field field-wide">Bill name <input id="bill-title" maxlength="100" type="text" value="New bill" autocomplete="off"></label>
+            <label class="field">Service charge (%) <div class="suffix-input"><input id="service-rate" type="text" inputmode="decimal" value="10" aria-describedby="service-help"><span aria-hidden="true">%</span></div></label>
+            <label class="field">Receipt total (optional) <div class="prefix-input"><span class="currency-prefix" aria-hidden="true">£</span><input id="receipt-total" type="text" inputmode="decimal" placeholder="e.g. 83.75" aria-describedby="receipt-help"></div></label>
+          </div>
+          <label class="field currency-choice" for="bill-currency">Bill currency
+            <select id="bill-currency" aria-describedby="bill-currency-note">
+              <option value="GBP">GBP — British pound (£)</option>
+              <option value="USD">USD — US dollar ($)</option>
+              <option value="EUR">EUR — Euro (€)</option>
+            </select>
+          </label>
+          <p id="bill-currency-note" class="hint">Choose the currency printed on the receipt or menu before adding items.</p>
+          <p id="service-help" class="hint">Changes recalculate the entire bill as you type, including on mobile. Invalid or unfinished values keep the last valid rate.</p>
+          <p id="service-feedback" class="field-feedback" role="status" aria-live="polite"></p>
+          <div class="inline-buttons" role="group" aria-label="Quick service charge percentage">
+            <button type="button" class="rate-preset" data-rate="0">0%</button>
+            <button type="button" class="rate-preset" data-rate="10">10%</button>
+            <button type="button" class="rate-preset" data-rate="12.5">12.5%</button>
+            <button type="button" class="rate-preset" data-rate="15">15%</button>
+          </div>
+          <div class="settings-live-preview" aria-live="polite"><span>Updated total <small id="settings-service-info">Including £0.00 service</small></span><strong id="settings-total">£0.00</strong></div>
+          <p id="receipt-help" class="hint">Optional: compare your calculation against the restaurant's printed total. Updates as you type.</p>
+          <p id="receipt-feedback" class="field-feedback" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="panel" aria-labelledby="diners-title">
+          <div class="section-heading"><span class="step">02</span><div><h2 id="diners-title">Who's dining?</h2><p class="hint">Add once, then tap names to assign items.</p></div></div>
+          <form id="participant-form" class="inline-form">
+            <label class="sr-only" for="participant-name">New diner's name</label>
+            <input id="participant-name" type="text" maxlength="50" placeholder="e.g. Alex" required autocomplete="off">
+            <button type="submit" class="button button-secondary">Add diner</button>
+          </form>
+          <div id="participants" class="chips" aria-label="Select diners to share a new item"></div>
+          <p class="hint" id="selected-help">Select one or more diners for the item below.</p>
+        </section>
+
+        <section class="panel" aria-labelledby="item-title">
+          <div class="section-heading"><span class="step">03</span><div><h2 id="item-title">Add an item</h2><p class="hint">Enter an item manually, or use a scanned suggestion. Nothing is added until you press Add item.</p></div></div>
+          <div id="scan-picker-wrap" class="scan-picker-wrap hidden">
+            <label class="field" for="scanned-item-picker">Choose a recognised scan item
+              <select id="scanned-item-picker"><option value="">Choose an item to fill name and price…</option></select>
+            </label>
+            <p class="hint">Selecting here fills the fields below, but does not add the item to the bill. Scanned line prices are totals; if you raise the quantity, adjust the per-unit price.</p>
+          </div>
+          <form id="item-form" class="stack" novalidate>
+            <label class="field">Item name
+              <input id="item-description" type="text" list="item-suggestions" maxlength="120" placeholder="e.g. Margherita pizza" required autocomplete="off">
+              <datalist id="item-suggestions"></datalist>
+            </label>
+            <div class="form-grid">
+              <label class="field">Price each <div class="prefix-input"><span class="currency-prefix" aria-hidden="true">£</span><input id="item-price" type="text" inputmode="decimal" placeholder="12.50" required></div></label>
+              <label class="field">Quantity <input id="item-quantity" type="number" min="1" max="99" step="1" value="1" required></label>
+            </div>
+            <div class="form-actions">
+              <button id="save-item" type="submit" class="button button-primary">+ Add item</button>
+              <button id="cancel-edit" type="button" class="button button-quiet hidden">Cancel edit</button>
+            </div>
+          </form>
+          <div id="quick-add-wrap" class="quick-add-wrap hidden"><h3>Quick add again</h3><div id="quick-add" class="inline-buttons"></div></div>
+        </section>
+
+        <section class="panel" aria-labelledby="scan-title">
+          <div class="section-heading"><span class="step">04</span><div><h2 id="scan-title">Scan a receipt or menu</h2><p class="hint">Extract suggested item names and prices. Review and approve one by one; manual entry in Section 03 always works.</p></div></div>
+          <label class="field scan-mode-field" for="scan-mode">What are you scanning?
+            <select id="scan-mode" aria-describedby="scan-mode-help">
+              <option value="receipt">An itemised receipt — purchased items and totals</option>
+              <option value="menu">A restaurant menu — available dishes and prices</option>
+            </select>
+          </label>
+          <p id="scan-mode-help" class="hint">Receipt mode recognises purchased items and may suggest a printed total and service charge.</p>
+          <label for="receipt-image" class="upload-area"><span class="upload-icon" aria-hidden="true">◎</span><strong>Take a photo or choose an image</strong><small>PNG, JPEG or other browser-supported image, max 10 MB</small></label>
+          <input id="receipt-image" class="sr-only" type="file" accept="image/*" capture="environment">
+          <p id="ocr-status" class="hint" role="status" aria-live="polite">Your photo is not uploaded. The OCR engine downloads on first use and then processes the image in your browser.</p>
+          <details class="paste-details"><summary>Or paste OCR text from a receipt or menu</summary><label class="field">Recognised text <textarea id="receipt-text" rows="5" maxlength="18000" placeholder="Burger 14.50&#10;Fries 4.00&#10;Service charge 12.5% 2.31&#10;Total 20.81"></textarea></label><button id="parse-text-btn" type="button" class="button button-secondary">Review pasted items</button></details>
+          <div id="receipt-review" class="receipt-review hidden" aria-labelledby="review-title">
+            <div class="receipt-review-head"><h3 id="review-title">Review recognised items</h3><p class="hint">Edit any name or price and choose who ordered it. Different currencies cannot be added to the same bill. Press Add to bill on each correct line, or use it to fill the manual form in 03. Nothing is imported automatically.</p><p id="scan-progress" class="scan-progress" role="status" aria-live="polite"></p></div>
+            <div id="receipt-suggestions"></div>
+            <div id="receipt-lines" class="receipt-lines"></div>
+            <div class="form-actions"><button type="button" id="discard-scan-btn" class="button button-quiet">Discard this scan</button></div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="summary-column" aria-label="Bill summary">
+        <section class="panel total-panel" aria-labelledby="total-title">
+          <p class="eyebrow">LIVE TOTAL</p><h2 id="total-title">Your table's bill</h2>
+          <p class="grand-total" id="grand-total">£0.00</p>
+          <div class="summary-line"><span>Food &amp; drink</span><strong id="subtotal">£0.00</strong></div>
+          <div class="summary-line"><span id="service-label">Service (10%)</span><strong id="service-total">£0.00</strong></div>
+          <div id="reconciliation" class="reconciliation hidden" role="status"></div>
+        </section>
+        <section class="panel" aria-labelledby="split-title">
+          <div class="section-heading"><h2 id="split-title">What everyone owes</h2></div>
+          <div id="splits" class="split-list"><p class="empty-state">Add diners and items to see their totals.</p></div>
+        </section>
+        <section class="panel" aria-labelledby="items-title">
+          <div class="section-heading"><div><h2 id="items-title">All items</h2><p id="item-count" class="hint">0 items</p></div></div>
+          <div id="items" class="items-list"><p class="empty-state">Nothing added yet.</p></div>
+        </section>
+        <section class="panel" aria-labelledby="templates-title">
+          <div class="section-heading"><h2 id="templates-title">Reusable tables</h2></div>
+          <p class="hint">Save a group of diners and service rate. Templates never include ordered items.</p>
+          <form id="template-form" class="inline-form"><label class="sr-only" for="template-name">Template name</label><input id="template-name" maxlength="60" placeholder="e.g. Friday team dinner" required><button type="submit" class="button button-secondary">Save</button></form>
+          <div id="templates" class="template-list"></div>
+        </section>
+      </aside>
+    </div>
+  </main>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <footer class="site-footer shell">© <span id="year"></span> · <a href="https://github.com/safesploitOrg/dining-expense-calculator" rel="noopener noreferrer" target="_blank">Dining Split on GitHub</a> · Local-first · v2.0.2</footer>
+</body>
+</html>
